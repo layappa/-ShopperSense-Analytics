@@ -60,5 +60,30 @@ order by "number of customers" desc;
 
 /* 8. Top 3 Products per Category – Listed the most purchased products within each 
 category.*/
+with item_rank as (
+select category,
+item_purchased,
+count(customer_id) as total_count,
+ROW_NUMBER() over (partition  by category order by COUNT(customer_id) desc ) as order_rank
+from customer 
+group by category ,item_purchased
+)
+select order_rank ,category,item_purchased,total_count from item_rank
+where order_rank<=3;
+
+/* 9  Repeat Buyers & Subscriptions – Checked whether customers with >5 purchases are 
+more likely to subscribe. */
+select subscription_status ,
+count(customer_id) as total_customer
+from customer 
+where previous_purchases >5
+group by subscription_status order by total_customer ;
+
+--10. Revenue by Age Group – Calculated total revenue contribution of each age group.
+select age_group ,
+sum(purchase_amount) as total_purchase
+from customer
+group by age_group 
+order by total_purchase desc;
 
 
